@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giấy Chứng Nhận</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #fff;
+            margin: 0;
+            font-family: 'Roboto', serif;
+        }
+
+        .certificate {
+            width: 900px;
+            height: 630px;
+            text-align: center;
+            position: relative;
+            background: url('Thiết kế chưa có tênnen.png');
+            background-size: cover;
+            text-align: center;
+        }
+
+        .certificate h1, .certificate h2 {
+            font-size: 2em;
+            color: #3e4095;
+        }
+
+        .certificate .chungnhan {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ed3237;
+        }
+
+        .certificate p {
+            font-size: 1em;
+            margin: 10px 0;
+            color: #3e4095;
+        }
+
+        .recipient-name {
+            font-weight: bold;
+            font-size: 1em;
+            margin: 20px 0;
+            color: #3e4095;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+        }
+
+        .date {
+            width: 30%;
+            font-size: 0.6em;
+            margin-left: 50px;
+        }
+
+        .signature {
+            width: 70%;
+            font-size: 0.7em;
+            text-align: right;
+            margin-right: 30px;
+        }
+
+        .signature p {
+            margin: 5px 0;
+            text-align: center;
+        }
+
+        .signature-name {
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .logo {
+            width: 12%;
+            margin-top: 70px;
+        }
+
+        .logodau {
+            width: 25%;
+        }
+
+        .logochuki {
+            width: 35%;
+            margin-left: -50px;
+        }
+
+        .chungnhanlogo {
+            text-align: right;
+        }
+
+        .logochungnhan {
+            width: 35%;
+        }
+
+        #capture-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate" id="certificate">
+        <img src="Logo Hôi không nền.png" alt="Logo" class="logo">
+        <h1>HỘI DOANH NHÂN THÁI BÌNH MIỀN NAM</h1>
+        <h1 class="chungnhan">CHỨNG NHẬN</h1>
+        <p>Doanh nhân: <span class="recipient-name">[Tên Người Nhận]</span></p>
+        <p>Đơn vị: <span class="recipient-name">[Tên Công ty]</span></p>
+        <p><span class="recipient-name">Là hội viên của Hội Doanh Nhân Thái Bình Miền Nam</span></p>
+        <div class="footer">
+            <div class="date"><p>NGÀY THAM GIA</p>
+                <p>[NGÀY THÁNG NĂM]</p>
+            </div>
+            <div class="chungnhanlogo">
+                <img src="chungnhan.png" alt="Logo" class="logochungnhan">
+            </div>
+            <div class="signature">
+                <p>TM.BCH HỘI DOANH NHÂN THÁI BÌNH MIỀN NAM</p>
+                <p>CHỦ TỊCH</p>
+                <center>
+                    <img src="z4784759786437_5690b3e07f54dec3782ef7e64f6f25e0-removebg-preview.png" alt="Logo" class="logodau">
+                    <img src="Chữ ký CT Linh-fotor-bg-remover-20240528135051.png" alt="Logo" class="logochuki">
+                </center>
+                <p class="signature-name">NGUYỄN TUẤN LINH</p>
+            </div>
+        </div>
+    </div>
+    <button id="capture-btn">Chụp trang này</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        document.getElementById('capture-btn').addEventListener('click', function() {
+            html2canvas(document.getElementById('certificate')).then(function(canvas) {
+                // Create an <a> element for downloading the image
+                let link = document.createElement('a');
+                link.download = 'certificate.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>
