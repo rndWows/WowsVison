@@ -31,6 +31,7 @@
         .certificate h2 {
             font-size: 2em;
             color: #3e4095;
+            margin: 2px;
         }
 
         .certificate .chungnhan {
@@ -41,7 +42,7 @@
 
         .certificate p {
             font-size: 1.2em;
-            margin: 10px 0;
+            margin: 2px 0;
             color: #3e4095;
             text-align: left;
             margin-left: 100px;
@@ -116,6 +117,13 @@
             font-size: 1em;
             cursor: pointer;
         }
+        .horizontal-line {
+            width: 30%;
+            height: 3px; /* Adjust the height to match your line thickness */
+            background: linear-gradient(to right, rgba(255, 255, 255, 0), rgb(205 176 106), rgba(255, 255, 255, 0));
+            margin: 0 auto;
+            
+        }
     </style>
 </head>
 
@@ -126,6 +134,8 @@
         <h1 class="chungnhan">CHỨNG NHẬN</h1>
         <p>Doanh nhân: <span class="recipient-name" id="name"></span></p>
         <p>Đơn vị: <span class="recipient-name" id="cty"></span></p>
+        <br> <br>
+        <div class="horizontal-line"></div>
         <p><span class="recipient-name">Là hội viên của Hội Doanh Nhân Thái Bình Miền Nam</span></p>
         <div class="footer">
             <div class="date">
