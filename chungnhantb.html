@@ -181,7 +181,7 @@
             html2canvas(document.getElementById('certificate')).then(function (canvas) {
                 // Create an <a> element for downloading the image
                 let link = document.createElement('a');
-                link.download = 'certificate.png';
+                link.download = name+ ' chungnhan.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
