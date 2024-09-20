@@ -103,10 +103,8 @@
         }
 
         const formatCurrency = (amount) =>
-            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-                .format(amount)
-                .replace('₫', '')
-                .trim();
+            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
         const parseAmount = (value) => parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
 
         const form = document.getElementById('allocationForm');
