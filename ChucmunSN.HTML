@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/img/logos/logo.png" type="image/x-icon">
+    <title>Happy Birthday</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #ffffff;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 1000px;
+            height: auto;
+            overflow: hidden;
+            background-color: #ffffff;
+            margin: 20px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        .left,
+        .right {
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .left {
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: url('hinh1.jpg') no-repeat center center;
+            background-size: cover;
+            text-align: center;
+            border-right: 1.5px solid #ffffff;
+        }
+
+        .left img {
+            width: 200px;
+            height: 200px;
+            border: 2px solid gold;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .birthday-title {
+            font-size: 24px;
+            font-family: 'Verdana', serif;
+        }
+
+        .name {
+            font-size: 26px;
+            color: gold;
+            font-family: 'Calibri', serif;
+            font-weight: bolder;
+            text-shadow: 5px 5px 10px gold;
+        }
+
+        .right {
+            justify-content: center;
+            padding: 25px 20px;
+            width: 100%;
+            background: url('hinh2.jpg') no-repeat center center;
+            background-size: cover;
+            color: #ffffff;
+        }
+
+        .rightnho {
+            padding: 20px;
+            border: 5px solid #ffffff;
+        }
+
+        .right p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .logohoi {
+            width: 50px;
+            margin-bottom: 20px;
+        }
+
+        .hpbd {
+            width: 150px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 110px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+        @media print {
+            #in * {
+                visibility: hidden;
+            }
+
+            #footer,
+            #footer,
+            #content * {
+                visibility: visible;
+            }
+
+            /* Nếu bạn muốn hiện các phần khác của nội dung, hãy tùy chỉnh các selector */
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                flex-direction: row;
+            }
+
+            .left,
+            .right {
+                width: 50%;
+            }
+
+            .left img {
+                width: 300px;
+                height: 400px;
+            }
+
+            .birthday-title {
+                font-size: 40px;
+            }
+
+            .name {
+                font-size: 42px;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var name = getUrlParameter('name');
+            var a = getUrlParameter('a');
+            var linkAnh = getUrlParameter('linkAnh');
+
+            document.getElementById('name').textContent = name;
+            document.getElementById('a').textContent = a;
+            var imageUrl = decodeURIComponent(linkAnh);
+            var logoImg = document.getElementById('logo');
+            logoImg.src = linkAnh;
+
+            logoImg.onload = function () {
+                if (logoImg.complete) {
+                    console.log("Image loaded:", linkAnh);
+
+                    document.getElementById('capture-btn').addEventListener('click', function () {
+                        html2canvas(document.querySelector('.container')).then(function (canvas) {
+                            // Create an <a> element for downloading the image
+                            let link = document.createElement('a');
+                            link.download = name + 'hpbd.png';
+                            link.href = canvas.toDataURL();
+                            link.click();
+                        });
+                    });
+                } else {
+                    console.error("Error loading image:", linkAnh);
+                }
+            };
+        });
+    </script>
+</head>
+
+<body>
+    <div id="in"><button type="button" class="btn btn-outline-primary" onclick="window.print()">In hoặc xuất
+        PDF</button>
+    <div class="container" >
+        <div class="card" id="content">
+            <div class="left">
+                <img id="logo" alt="avata" src="">
+                <div class="birthday-title">Happy Birthday</div> <br>
+                <div class="name" id="name"></div>
+            </div>
+            <div class="right">
+                <div class="rightnho">
+                    <center><img src="assets/img/logos/logo.png" alt="Logohoi" class="logohoi"></center>
+                    <center><img src="hpbd.png" alt="hpbd" class="hpbd"></center>
+                    <p>&emsp;Hội Doanh nhân Thái Bình miền Nam chúc mừng sinh nhật bạn, Hội mong rằng, là hội viên và việc đồng hành cùng Hội của bạn sẽ là Động Lực để bạn YÊU THÍCH TUỔI MỚI.</p>
+                   
+                    <p>&emsp;Chúc bạn sinh nhật vui vẻ!</p>
+                    <div class="footer">
+                       
+                        <p style="margin-top: -10px;">Thường trực Hội DNTBMN.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+</html>
