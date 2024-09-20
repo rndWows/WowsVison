@@ -103,8 +103,10 @@
         }
 
         const formatCurrency = (amount) =>
-            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
-
+            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                .format(amount)
+                .replace('₫', '')
+                .trim();
         const parseAmount = (value) => parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
 
         const form = document.getElementById('allocationForm');
@@ -210,6 +212,7 @@
             updateFormCalculations();
         });
 
+        // New function to send data to AppSheet
         async function sendDataToAppSheet() {
             const fiscalYear = document.getElementById('fiscalYear').value;
             const totalAmount = parseAmount(totalAmountInput.value);
@@ -224,11 +227,13 @@
                 const monthInput = document.getElementById(`m${i}`);
                 monthData[`month${i}`] = monthInput ? parseFloat(monthInput.value) || 0 : 0;
             }
-
+            console.log(monthData);
+            console.log(quarterData);
             const duAnData = {
                 "Năm Phân Bổ": fiscalYear,
                 "Số tiền": totalAmount,
                 "Quý 1": quarterData.q1 / 100,
+
                 "Quý 2": quarterData.q2 / 100,
                 "Quý 3": quarterData.q3 / 100,
                 "Quý 4": quarterData.q4 / 100,
@@ -236,6 +241,8 @@
                 "Tháng 2": monthData.month2 / 100,
                 "Tháng 3": monthData.month3 / 100,
                 "Tháng 4": monthData.month4 / 100,
+
+
                 "Tháng 5": monthData.month5 / 100,
                 "Tháng 6": monthData.month6 / 100,
                 "Tháng 7": monthData.month7 / 100,
@@ -244,28 +251,21 @@
                 "Tháng 10": monthData.month10 / 100,
                 "Tháng 11": monthData.month11 / 100,
                 "Tháng 12": monthData.month12 / 100
+
             };
 
-            return apiRequest('FormPhanbo', 'Add', {
+            console.log(duAnData);
+
+
+            const duAnResponse = await apiRequest('FormPhanbo', 'Add', {
                 Rows: [duAnData]
             });
-        }
 
-        // Sử dụng FuiToast.promise
-        FuiToast.promise(
-            sendDataToAppSheet(),
-            {
-                loading: 'Đang gửi dữ liệu...',
-                success: (data) => {
-                    console.log(data);
-                    return 'Gửi dữ liệu thành công!';
-                },
-                error: 'Có lỗi xảy ra khi gửi dữ liệu!',
-            },
-            {
-                isClose: true
-            }
-        );
+            FuiToast.success("Gửi dữ liệu thành công.")
+
+
+
+        }
 
         // Add event listener to the submit button
         document.addEventListener('DOMContentLoaded', () => {
