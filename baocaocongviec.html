@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê công việc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="https://wows.vn/wp-content/uploads/2022/04/WOWS-GROUP-logo.png" type="image/x-icon">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/10.3.3/highcharts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+</head>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        // ... other Tailwind configurations ...
+    }
+</script>
+
+<body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
+    <nav class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-10">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://wows.vn/wp-content/uploads/2022/04/WOWS-GROUP-logo.png" alt="WOWS Group"
+                    class="h-8 mr-4">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Thống kê công việc</h1>
+            </div>
+            <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4 mt-16">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Bộ lọc</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <select id="employeeFilter"
+                    class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="">Nhân viên phụ trách</option>
+                </select>
+                <select id="dateRangeFilter"
+                    class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="">Chọn phạm vi ngày</option>
+                </select>
+                <select id="departmentFilter"
+                    class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white">
+                    <option value="">Phòng ban phụ trách</option>
+                </select>
+                <button id="resetFilters"
+                    class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Reset</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tổng hợp</h2>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center bg-blue-100 dark:bg-blue-900 p-4 rounded-lg">
+                        <div id="totalTasks" class="text-3xl font-bold text-blue-600 dark:text-blue-300">0</div>
+                        <div id="totalTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Tổng công việc</div>
+                    </div>
+                    <div class="text-center bg-green-100 dark:bg-green-900 p-4 rounded-lg">
+                        <div id="completedTasks" class="text-3xl font-bold text-green-600 dark:text-green-300">0</div>
+                        <div id="completedTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Đã hoàn thành</div>
+                    </div>
+                    <div class="text-center bg-purple-100 dark:bg-purple-900 p-4 rounded-lg">
+                        <div id="ongoingTasks" class="text-3xl font-bold text-purple-600 dark:text-purple-300">0</div>
+                        <div id="ongoingTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Đang làm</div>
+                    </div>
+                    <div class="text-center bg-yellow-100 dark:bg-yellow-900 p-4 rounded-lg">
+                        <div id="assignedTasks" class="text-3xl font-bold text-yellow-600 dark:text-yellow-300">0</div>
+                        <div id="assignedTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Đã nhận</div>
+                    </div>
+                    <div class="text-center bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                        <div id="newTasks" class="text-3xl font-bold text-gray-600 dark:text-gray-300">0</div>
+                        <div id="newTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Mới giao</div>
+                    </div>
+                    <div class="text-center bg-red-100 dark:bg-red-900 p-4 rounded-lg">
+                        <div id="cancelledTasks" class="text-3xl font-bold text-red-600 dark:text-red-300">0</div>
+                        <div id="cancelledTasksDiff" class="text-sm font-semibold"></div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Việc hủy</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+                <div id="statusPieChart"></div>
+            </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
+            <div id="taskTimelineChart"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tình trạng hoàn thành</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-700">
+                                <th class="text-left p-2">Nhân viên phụ trách</th>
+                                <th class="text-right p-2">Đúng hạn</th>
+                                <th class="text-right p-2">Trễ hạn</th>
+                                <th class="text-right p-2">Tổng cộng</th>
+                                <th class="text-right p-2">Tỷ lệ trễ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="completionStatusTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tình trạng duyệt công việc</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-700">
+                                <th class="text-left p-2">Nhân viên phụ trách</th>
+                                <th class="text-right p-2">Đang xem xét</th>
+                                <th class="text-right p-2">Đã duyệt</th>
+                                <th class="text-right p-2">Chờ duyệt</th>
+                                <th class="text-right p-2">Từ chối</th>
+                                <th class="text-right p-2">Tổng cộng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="approvalStatusTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const htmlElement = document.documentElement;
+        const appId = '9baee04f-294c-4e71-b2b6-18c567ffbf37';
+        const accessKey = 'V2-WN3IO-7HVVW-8r2NO-lcWj2-fNq9W-dMcjB-pSPLf-LyOtj';
+        const region = 'www';
+
+        let allData = [];
+        let filteredData = [];
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            htmlElement.classList.toggle('dark');
+            updateDashboard(); // Assuming this function exists to update your charts
+
+            // Optional: Save the user's preference
+            const isDarkMode = htmlElement.classList.contains('dark');
+            localStorage.setItem('darkMode', isDarkMode);
+
+            // Update the icon
+            updateDarkModeIcon();
+        }
+
+        // Function to update the icon based on the current mode
+        function updateDarkModeIcon() {
+            const isDarkMode = htmlElement.classList.contains('dark');
+            darkModeToggle.innerHTML = isDarkMode
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>';
+        }
+
+        // Add click event listener to the toggle button
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+        function apiRequest(tableName, action, data) {
+            const apiUrl = `https://${region}.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
+            return fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'ApplicationAccessKey': accessKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Action: action,
+                    Properties: {},
+                    ...data
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("API response:", data);
+                    return data;
+                })
+                .catch(error => {
+                    console.error("Lỗi API:", error);
+                    throw error;
+                });
+        }
+
+        async function fetchDataFromAppSheet() {
+            try {
+                const response = await apiRequest('Data', 'Find', {
+                    Selector: "Filter(Data, true)"
+                });
+                if (!Array.isArray(response) || response.length === 0) {
+                    console.error("Không nhận được dữ liệu hợp lệ từ API:", response);
+                    throw new Error("Dữ liệu không hợp lệ");
+                }
+                allData = response;
+                console.log("Data fetched from AppSheet:", allData);
+                return allData;
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu từ AppSheet:", error);
+                throw error;
+            }
+        }
+
+        function filterData() {
+            const employee = document.getElementById('employeeFilter').value;
+            const dateRange = document.getElementById('dateRangeFilter').value;
+            const department = document.getElementById('departmentFilter').value;
+
+            filteredData = allData.filter(item => {
+                const employeeMatch = !employee || item['Nhân viên phụ trách'] === employee;
+                const departmentMatch = !department || item['Phòng ban phụ trách'] === department;
+                const dateMatch = !dateRange || isWithinDateRange(item['Ngày giao việc'], dateRange);
+                return employeeMatch && departmentMatch && dateMatch;
+            });
+
+            updateDashboard();
+        }
+
+        function isWithinDateRange(dateString, range) {
+            const date = moment(dateString, "MM/DD/YYYY HH:mm:ss");
+            const now = moment();
+            return now.diff(date, 'days') <= parseInt(range);
+        }
+
+        function updateDashboard() {
+            updateSummary();
+            updateStatusPieChart();
+            updateTaskTimelineChart();
+            updateCompletionStatusTable();
+            updateApprovalStatusTable();
+        }
+
+        function updateSummary() {
+            const summaryItems = [
+                { id: 'totalTasks', status: 'Tổng công việc', color: '#3B82F6' }, // blue-600
+                { id: 'completedTasks', status: '4. Đã hoàn thành', color: STATUS_COLORS['4. Đã hoàn thành'] },
+                { id: 'ongoingTasks', status: '3. Việc đang làm', color: STATUS_COLORS['3. Việc đang làm'] },
+                { id: 'assignedTasks', status: '2. Việc đã nhận chưa bắt đầu', color: STATUS_COLORS['2. Việc đã nhận chưa bắt đầu'] },
+                { id: 'newTasks', status: '1. Việc mới giao', color: STATUS_COLORS['1. Việc mới giao'] },
+                { id: 'cancelledTasks', status: '5. Việc hủy', color: STATUS_COLORS['5. Việc hủy'] }
+            ];
+
+            summaryItems.forEach(item => {
+                const element = document.getElementById(item.id);
+                const count = item.status === 'Tổng công việc'
+                    ? filteredData.length
+                    : filteredData.filter(task => task['Tình trạng'] === item.status).length;
+                element.textContent = count;
+                element.style.color = item.color;
+            });
+        }
+        // Định nghĩa các màu sắc tương ứng với các trạng thái
+        const STATUS_COLORS = {
+            '4. Đã hoàn thành': '#10B981', // green-600
+            '3. Việc đang làm': '#8B5CF6', // purple-600
+            '2. Việc đã nhận chưa bắt đầu': '#FBBF24', // yellow-600
+            '1. Việc mới giao': '#6B7280', // gray-600
+            '5. Việc hủy': '#EF4444', // red-600
+        };
+        function updateStatusPieChart() {
+            const statusCounts = filteredData.reduce((acc, item) => {
+                const status = item['Tình trạng'];
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const seriesData = Object.entries(statusCounts).map(([name, y]) => ({
+                name,
+                y,
+                color: STATUS_COLORS[name] || Highcharts.getOptions().colors[0] // Fallback color if not defined
+            }));
+
+            Highcharts.chart('statusPieChart', {
+                chart: {
+                    type: 'pie',
+                    backgroundColor: 'transparent'
+                },
+                title: {
+                    text: 'Tình trạng công việc',
+                    style: {
+                        color: '#333333',
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                },
+                accessibility: {
+                    point: {
+                        valueSuffix: '%'
+                    }
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                            style: {
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                                textOutline: 'none'
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Tỷ lệ',
+                    colorByPoint: true,
+                    data: seriesData
+                }]
+            });
+        }
+
+
+        function updateTaskTimelineChart() {
+            const timelineData = filteredData.reduce((acc, item) => {
+                const date = moment(item['Ngày giao việc'], "MM/DD/YYYY HH:mm:ss").format('DD/MM/YYYY');
+                if (!acc[date]) {
+                    acc[date] = { total: 0, completed: 0 };
+                }
+                acc[date].total++;
+                if (item['Tình trạng'] === '4. Đã hoàn thành') {
+                    acc[date].completed++;
+                }
+                return acc;
+            }, {});
+
+            const dates = Object.keys(timelineData).sort((a, b) => moment(a, 'DD/MM/YYYY').diff(moment(b, 'DD/MM/YYYY')));
+            const totalData = dates.map(date => [Date.parse(moment(date, 'DD/MM/YYYY')), timelineData[date].total]);
+            const completedData = dates.map(date => [Date.parse(moment(date, 'DD/MM/YYYY')), timelineData[date].completed]);
+
+            Highcharts.chart('taskTimelineChart', {
+                chart: {
+                    zoomType: 'xy',
+                    backgroundColor: 'transparent'
+                },
+                title: {
+                    text: 'Số công việc theo thời gian',
+                    style: {
+                        color: '#333333',
+                        fontWeight: 'bold'
+                    }
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                        day: '%d/%m/%Y'
+                    },
+                    title: {
+                        text: 'Ngày'
+                    }
+                },
+                yAxis: [{
+                    title: {
+                        text: 'Tổng số công việc',
+                        style: {
+                            color: '#3498db' // Màu xanh dương
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#3498db'
+                        }
+                    }
+                }, {
+                    title: {
+                        text: 'Số công việc hoàn thành',
+                        style: {
+                            color: '#2ecc71' // Màu xanh lá
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#2ecc71'
+                        }
+                    },
+                    opposite: true
+                }],
+                tooltip: {
+                    shared: true,
+                    formatter: function () {
+                        return moment(this.x).format('DD/MM/YYYY') + '<br>' +
+                            '<span style="color:#3498db">●</span> Tổng số công việc: <b>' + this.points[0].y + '</b><br>' +
+                            '<span style="color:#2ecc71">●</span> Số công việc hoàn thành: <b>' + this.points[1].y + '</b>';
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    x: 80,
+                    verticalAlign: 'top',
+                    y: 55,
+                    floating: true,
+                    backgroundColor: 'rgba(255,255,255,0.25)'
+                },
+                series: [{
+                    name: 'Tổng số công việc',
+                    type: 'column',
+                    color: '#3498db', // Màu xanh dương
+                    data: totalData,
+                    yAxis: 0,
+                    tooltip: {
+                        valueSuffix: ' công việc'
+                    }
+                }, {
+                    name: 'Số công việc hoàn thành',
+                    type: 'spline',
+                    color: '#2ecc71', // Màu xanh lá
+                    data: completedData,
+                    yAxis: 1,
+                    tooltip: {
+                        valueSuffix: ' công việc'
+                    }
+                }]
+            });
+        }
+        function updateCompletionStatusTable() {
+            const tableBody = document.getElementById('completionStatusTable');
+            tableBody.innerHTML = '';
+
+            const completionStatus = filteredData.reduce((acc, item) => {
+                const employee = item['Nhân viên phụ trách'];
+                if (!acc[employee]) {
+                    acc[employee] = { onTime: 0, late: 0 };
+                }
+                if (item['Tình trạng hoàn thành'] === 'Đúng hạn') {
+                    acc[employee].onTime++;
+                } else if (item['Tình trạng hoàn thành'] === 'Trễ hạn') {
+                    acc[employee].late++;
+                }
+                return acc;
+            }, {});
+
+            Object.entries(completionStatus).forEach(([employee, status], index) => {
+                const total = status.onTime + status.late;
+                const lateRatio = total > 0 ? (status.late / total * 100).toFixed(2) : 0;
+
+                const row = tableBody.insertRow();
+                row.className = index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
+                row.innerHTML = `
+            <td class="p-2">${employee}</td>
+            <td class="text-right p-2">${status.onTime}</td>
+            <td class="text-right p-2">${status.late}</td>
+            <td class="text-right p-2">${total}</td>
+            <td class="text-right p-2">${lateRatio}%</td>
+        `;
+
+                // Thêm màu sắc cho tỷ lệ trễ
+                const lateRatioCell = row.cells[4];
+                if (lateRatio > 20) {
+                    lateRatioCell.classList.add('text-red-600', 'dark:text-red-400');
+                } else if (lateRatio > 10) {
+                    lateRatioCell.classList.add('text-yellow-600', 'dark:text-yellow-400');
+                } else {
+                    lateRatioCell.classList.add('text-green-600', 'dark:text-green-400');
+                }
+            });
+        }
+
+        function updateApprovalStatusTable() {
+            const tableBody = document.getElementById('approvalStatusTable');
+            tableBody.innerHTML = '';
+
+            const approvalStatus = filteredData.reduce((acc, item) => {
+                const employee = item['Nhân viên phụ trách'];
+                if (!acc[employee]) {
+                    acc[employee] = { reviewing: 0, approved: 0, pending: 0, rejected: 0 };
+                }
+                if (item['Trạng thái Duyệt'] === 'Chờ duyệt') {
+                    acc[employee].reviewing++;
+                } else if (item['Trạng thái Duyệt'] === 'Đã duyệt') {
+                    acc[employee].approved++;
+                } else if (item['Trạng thái Duyệt'] === null || item['Trạng thái Duyệt'] === '') {
+                    acc[employee].pending++;
+                } else if (item['Trạng thái Duyệt'] === 'Từ chối') {
+                    acc[employee].rejected++;
+                }
+                return acc;
+            }, {});
+
+            Object.entries(approvalStatus).forEach(([employee, status], index) => {
+                const total = status.reviewing + status.approved + status.pending + status.rejected;
+
+                const row = tableBody.insertRow();
+                row.className = index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
+                row.innerHTML = `
+            <td class="p-2">${employee}</td>
+            <td class="text-right p-2">${status.reviewing}</td>
+            <td class="text-right p-2">${status.approved}</td>
+            <td class="text-right p-2">${status.pending}</td>
+            <td class="text-right p-2">${status.rejected}</td>
+            <td class="text-right p-2 font-bold">${total}</td>
+        `;
+            });
+        }
+
+        function populateFilters() {
+            const employeeFilter = document.getElementById('employeeFilter');
+            const departmentFilter = document.getElementById('departmentFilter');
+            const dateRangeFilter = document.getElementById('dateRangeFilter');
+
+            const employees = [...new Set(allData.map(item => item['Nhân viên phụ trách']))];
+            const departments = [...new Set(allData.map(item => item['Phòng ban phụ trách']))];
+
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = option.textContent = employee;
+                employeeFilter.appendChild(option);
+            });
+
+            departments.forEach(department => {
+                const option = document.createElement('option');
+                option.value = option.textContent = department;
+                departmentFilter.appendChild(option);
+            });
+
+            const dateRanges = [
+                { value: '7', text: '7 ngày qua' },
+                { value: '30', text: '30 ngày qua' },
+                { value: '90', text: '90 ngày qua' },
+                { value: '180', text: '6 tháng qua' },
+                { value: '365', text: '1 năm qua' }
+            ];
+
+            dateRanges.forEach(range => {
+                const option = document.createElement('option');
+                option.value = range.value;
+                option.textContent = range.text;
+                dateRangeFilter.appendChild(option);
+            });
+        }
+
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('employeeFilter').value = '';
+            document.getElementById('dateRangeFilter').value = '';
+            document.getElementById('departmentFilter').value = '';
+            filteredData = allData;
+            updateDashboard();
+        });
+
+        ['employeeFilter', 'dateRangeFilter', 'departmentFilter'].forEach(id => {
+            document.getElementById(id).addEventListener('change', filterData);
+        });
+
+       
+        function initializeDarkMode() {
+            const savedMode = localStorage.getItem('darkMode');
+            if (savedMode !== null) {
+                htmlElement.classList.toggle('dark', savedMode === 'true');
+            } else {
+                const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                htmlElement.classList.toggle('dark', prefersDarkMode);
+            }
+            updateDarkModeIcon();
+        }
+        
+        // Call the initialization function when the page loads
+        document.addEventListener('DOMContentLoaded', initializeDarkMode);
+        // Initialize the dashboard
+        (async function init() {
+            allData = await fetchDataFromAppSheet();
+            filteredData = allData;
+            populateFilters();
+            updateDashboard();
+        })();
+    </script>
+</body>
+
+</html>
