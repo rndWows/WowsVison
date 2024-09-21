@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu mẫu Phân bổ Năm Tài chính</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-r from-blue-100 to-blue-200 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-8xl w-full">
+        <h1 class="text-4xl font-bold mb-8 text-center text-blue-600">Biểu mẫu Phân bổ Năm Tài chính</h1>
+        <form id="allocationForm" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label for="fiscalYear" class="block text-sm font-medium text-gray-700">Năm Tài chính</label>
+                    <input type="number" id="fiscalYear" name="fiscalYear" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                        placeholder="Nhập năm tài chính">
+                </div>
+                <div class="space-y-2">
+                    <label for="totalAmount" class="block text-sm font-medium text-gray-700">Tổng số tiền</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" id="totalAmount" name="totalAmount" required
+                            class="block w-full pr-12 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0" aria-describedby="amount-currency">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-lg" id="amount-currency">VNĐ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 bg-blue-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold text-blue-800">Phân bổ Quý</h2>
+                <p id="remainingQuarterAllocation" class="text-blue-600 font-medium text-lg"></p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label for="q1" class="block text-sm font-medium text-gray-700">%Quý 1</label>
+                        <input type="number" id="q1" name="q1" required min="0" max="100"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0">
+                        <p id="q1Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="q2" class="block text-sm font-medium text-gray-700">%Quý 2</label>
+                        <input type="number" id="q2" name="q2" required min="0" max="100"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0">
+                        <p id="q2Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="q3" class="block text-sm font-medium text-gray-700">%Quý 3</label>
+                        <input type="number" id="q3" name="q3" required min="0" max="100"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0">
+                        <p id="q3Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="q4" class="block text-sm font-medium text-gray-700">%Quý 4</label>
+                        <input type="number" id="q4" name="q4" required min="0" max="100"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0">
+                        <p id="q4Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="monthlyAllocation" class="space-y-6">
+                <h2 class="text-2xl font-semibold text-blue-800">Phân bổ Tháng</h2>
+                <div id="monthInputs" class="space-y-8"></div>
+            </div>
+        </form>
+        <div class="mt-12">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex" aria-label="Tabs">
+                    <button
+                        class="tab-button text-blue-600 border-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-target="businessTab">
+                        Theo mảng kinh doanh
+                    </button>
+                    <button
+                        class="tab-button text-gray-500 border-transparent whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-target="employeeTab">
+                        Theo nhân viên
+                    </button>
+                    <button
+                        class="tab-button text-gray-500 border-transparent whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                        data-target="sourceTab">
+                        Theo nguồn
+                    </button>
+                </nav>
+            </div>
+
+            <div id="tabContent" class="mt-4 overflow-x-auto">
+                <!-- Nội dung tab sẽ được điền bởi JavaScript -->
+            </div>
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('allocationForm');
+        const quarterInputs = ['q1', 'q2', 'q3', 'q4'];
+        const totalAmountInput = document.getElementById('totalAmount');
+        const monthlyAllocationDiv = document.getElementById('monthlyAllocation');
+        const monthInputsDiv = document.getElementById('monthInputs');
+        const remainingQuarterAllocationDiv = document.getElementById('remainingQuarterAllocation');
+
+        // Dữ liệu mẫu
+        const sampleData = {
+            business: [
+                { name: "[LEA] Tiếng Anh trung tâm" },
+                { name: "[LEA] Tiếng Anh theo yêu cầu" },
+                { name: "[LEA] Tiếng Anh doanh nghiệp" },
+                { name: "[LEA] Doanh thu LEA khác" },
+                { name: "[VIS] Tư vấn doanh nghiệp" },
+                { name: "[VIS] Phần mềm" },
+                { name: "[VIS] Tuyển dụng" },
+                { name: "[VIS] Doanh thu VIS khác" }
+            ],
+            employee: [
+                { name: "Lã Văn Tiến" },
+                { name: "Đỗ Thị Kim Thuỷ" },
+                { name: "Trần Thị Cẩm Nhung" },
+                { name: "Nguyễn Thị Mỹ Diên" },
+                { name: "Huỳnh Anh Tuấn" }
+            ],
+            source: [
+                { name: "01. Tìm kiếm online" },
+                { name: "02. Giới thiệu/ Cộng tác viên" },
+                { name: "03. Sự kiện trực tiếp" },
+                { name: "04. KH cũ đăng ký lại" },
+                { name: "05. Quảng cáo ngoài trời" },
+                { name: "06. Hiệp hội" },
+                { name: "07. Khác" }
+            ]
+        };
+
+        const columns = [
+            { name: "% KH DT năm", type: "percent" },
+            { name: "KH DT năm", type: "amount" },
+            { name: "% KH DT Q. I", type: "percent" },
+            { name: "KH DT Q. I", type: "amount" },
+            { name: "% KH DT Q. II", type: "percent" },
+            { name: "KH DT Q. II", type: "amount" },
+            { name: "% KH DT Q. III", type: "percent" },
+            { name: "KH DT Q. III", type: "amount" },
+            { name: "% KH DT Q. IV", type: "percent" },
+            { name: "KH DT Q. IV", type: "amount" },
+            { name: "% KH DT T1/Quý", type: "percent" },
+            { name: "KH DT T1", type: "amount" },
+            { name: "% KH DT T2/Quý", type: "percent" },
+            { name: "KH DT T2", type: "amount" },
+            { name: "% KH DT T3/Quý", type: "percent" },
+            { name: "KH DT T3", type: "amount" },
+            { name: "% KH DT T4/Quý", type: "percent" },
+            { name: "KH DT T4", type: "amount" },
+            { name: "% KH DT T5/Quý", type: "percent" },
+            { name: "KH DT T5", type: "amount" },
+            { name: "% KH DT T6/Quý", type: "percent" },
+            { name: "KH DT T6", type: "amount" },
+            { name: "% KH DT T7/Quý", type: "percent" },
+            { name: "KH DT T7", type: "amount" },
+            { name: "% KH DT T8/Quý", type: "percent" },
+            { name: "KH DT T8", type: "amount" },
+            { name: "% KH DT T9/Quý", type: "percent" },
+            { name: "KH DT T9", type: "amount" },
+            { name: "% KH DT T10/Quý", type: "percent" },
+            { name: "KH DT T10", type: "amount" },
+            { name: "% KH DT T11/Quý", type: "percent" },
+            { name: "KH DT T11", type: "amount" },
+            { name: "% KH DT T12/Quý", type: "percent" },
+            { name: "KH DT T12", type: "amount" }
+        ];
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        function updateFormCalculations() {
+            const totalAmount = parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
+            let totalPercentage = 0;
+
+            quarterInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                const percentage = parseFloat(input.value) || 0;
+                totalPercentage += percentage;
+                const amount = totalAmount * (percentage / 100);
+                document.getElementById(`${id}Amount`).textContent = formatCurrency(amount);
+            });
+
+            const remainingPercentage = 100 - totalPercentage;
+            const remainingAmount = totalAmount * (remainingPercentage / 100);
+            remainingQuarterAllocationDiv.textContent = `Còn phải phân bổ: ${remainingPercentage.toFixed(2)}% (${formatCurrency(remainingAmount)})`;
+
+            updateMonthlyAllocation();
+        }
+
+        function updateMonthlyAllocation() {
+            monthInputsDiv.innerHTML = '';
+            const totalAmount = parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
+
+            quarterInputs.forEach((id, index) => {
+                const quarterPercentage = parseFloat(document.getElementById(id).value) || 0;
+                const quarterAmount = totalAmount * (quarterPercentage / 100);
+
+                if (quarterPercentage > 0) {
+                    const monthInputDiv = document.createElement('div');
+                    monthInputDiv.className = 'bg-blue-50 p-6 rounded-lg space-y-4';
+                    monthInputDiv.innerHTML = `
+                <h3 class="text-xl font-semibold text-blue-700">Quý ${index + 1} (${formatCurrency(quarterAmount)})</h3>
+                <p id="remainingMonthAllocation${index}" class="text-blue-600 font-medium"></p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <label for="m${index * 3 + 1}" class="block text-sm font-medium text-gray-700">%Tháng ${index * 3 + 1}</label>
+                        <input type="number" id="m${index * 3 + 1}" name="m${index * 3 + 1}" required min="0" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg" placeholder="0">
+                        <p id="m${index * 3 + 1}Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="m${index * 3 + 2}" class="block text-sm font-medium text-gray-700">%Tháng ${index * 3 + 2}</label>
+                        <input type="number" id="m${index * 3 + 2}" name="m${index * 3 + 2}" required min="0" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg" placeholder="0">
+                        <p id="m${index * 3 + 2}Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="m${index * 3 + 3}" class="block text-sm font-medium text-gray-700">%Tháng ${index * 3 + 3}</label>
+                        <input type="number" id="m${index * 3 + 3}" name="m${index * 3 + 3}" required min="0" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg" placeholder="0">
+                        <p id="m${index * 3 + 3}Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                    </div>
+                </div>
+            `;
+                    monthInputsDiv.appendChild(monthInputDiv);
+
+                    // Add event listeners to month inputs
+                    for (let i = 1; i <= 3; i++) {
+                        document.getElementById(`m${index * 3 + i}`).addEventListener('input', () => updateMonthAmounts(index));
+                    }
+
+                    updateMonthAmounts(index);
+                }
+            });
+        }
+
+        function updateMonthAmounts(quarterIndex) {
+            const totalAmount = parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
+            const quarterPercentage = parseFloat(document.getElementById(quarterInputs[quarterIndex]).value) || 0;
+            const quarterAmount = totalAmount * (quarterPercentage / 100);
+
+            let totalMonthPercentage = 0;
+            for (let i = 1; i <= 3; i++) {
+                const monthInput = document.getElementById(`m${quarterIndex * 3 + i}`);
+                const monthPercentage = parseFloat(monthInput.value) || 0;
+                totalMonthPercentage += monthPercentage;
+                const monthAmount = quarterAmount * (monthPercentage / 100);
+                document.getElementById(`m${quarterIndex * 3 + i}Amount`).textContent = formatCurrency(monthAmount);
+            }
+
+            const remainingMonthPercentage = 100 - totalMonthPercentage;
+            const remainingMonthAmount = quarterAmount * (remainingMonthPercentage / 100);
+            document.getElementById(`remainingMonthAllocation${quarterIndex}`).textContent =
+                `Còn phải phân bổ: ${remainingMonthPercentage.toFixed(2)}% (${formatCurrency(remainingMonthAmount)})`;
+        }
+        function createTable(data, tabName) {
+            let tableHTML = `
+    <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <!-- ... (phần thead giữ nguyên) ... -->
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            <!-- ... (phần tổng giữ nguyên) ... -->
+            ${data.map((item, rowIndex) => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${item.name}
+                    </td>
+                    ${columns.map((col, colIndex) => `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="relative">
+                                <input type="number" 
+                                       class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${col.type === 'percent' ? 'pr-6' : ''}" 
+                                       placeholder="0"
+                                       data-row="${rowIndex}"
+                                       data-col="${colIndex}"
+                                       data-type="${col.type}"
+                                       min="0"
+                                       max="${col.type === 'percent' ? '100' : ''}"
+                                       step="0.01"
+                                       oninput="updateTableCalculations(this)">
+                                ${col.type === 'percent' ? '<span class="absolute right-2 top-1/2 transform -translate-y-1/2">%</span>' : ''}
+                            </div>
+                        </td>
+                    `).join('')}
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    `;
+            return tableHTML;
+        }
+        document.addEventListener('input', function(e) {
+    if (e.target.matches('input[type="number"]')) {
+        let max = parseFloat(e.target.getAttribute('max'));
+        let value = parseFloat(e.target.value);
+        if (value > max) {
+            e.target.value = max;
+        }
+    }
+});
+        function updateTableCalculations(input) {
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            const type = input.dataset.type;
+            const value = parseFloat(input.value) || 0;
+
+            // Lấy giá trị từ form trên
+            const totalAmount = parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
+            console.log(totalAmount);
+            const quarterAmounts = quarterInputs.map(id =>
+                parseFloat(document.getElementById(`${id}Amount`).textContent.replace(/[^0-9.-]+/g, "")) || 0
+            );
+
+            // Tính toán giá trị tương ứng
+            if (type === 'percent') {
+                let correspondingAmount;
+                if (col === 0) { // % KH DT năm
+                    correspondingAmount = totalAmount * value;
+                    setInputValue(row, 1, correspondingAmount);
+                } else if (col === 2 || col === 4 || col === 6 || col === 8) { // % KH DT Quý
+                    const quarterIndex = (col - 2) / 2;
+                    correspondingAmount = quarterAmounts[quarterIndex] * value;
+                    setInputValue(row, col + 1, correspondingAmount);
+                } else if (col % 2 === 0 && col >= 10) { // % KH DT Tháng
+                    const quarterCol = Math.floor((col - 10) / 6) * 2 + 3;
+                    const quarterAmount = getInputValue(row, quarterCol);
+                    correspondingAmount = quarterAmount * value;
+                    setInputValue(row, col + 1, correspondingAmount);
+                }
+            } else if (type === 'amount') {
+                // Nếu người dùng nhập trực tiếp số tiền, cập nhật phần trăm tương ứng
+                let correspondingPercent;
+                if (col === 1) { // KH DT năm
+                    correspondingPercent = totalAmount !== 0 ? (value / totalAmount) * 100 : 0;
+                    setInputValue(row, 0, correspondingPercent);
+                } else if (col === 3 || col === 5 || col === 7 || col === 9) { // KH DT Quý
+                    const quarterIndex = (col - 3) / 2;
+                    correspondingPercent = quarterAmounts[quarterIndex] !== 0 ? (value / quarterAmounts[quarterIndex]) * 100 : 0;
+                    setInputValue(row, col - 1, correspondingPercent);
+                } else if (col % 2 === 1 && col >= 11) { // KH DT Tháng
+                    const quarterCol = Math.floor((col - 11) / 6) * 2 + 3;
+                    const quarterAmount = getInputValue(row, quarterCol);
+                    correspondingPercent = quarterAmount !== 0 ? (value / quarterAmount) * 100 : 0;
+                    setInputValue(row, col - 1, correspondingPercent);
+                }
+            }
+
+            updateTotal();
+        }
+
+        function setInputValue(row, col, value) {
+            const input = document.querySelector(`input[data-row="${row}"][data-col="${col}"]`);
+            if (input) {
+                input.value = value.toFixed(2);
+            }
+        }
+
+        function getInputValue(row, col) {
+            const input = document.querySelector(`input[data-row="${row}"][data-col="${col}"]`);
+            return input ? (parseFloat(input.value) || 0) : 0;
+        }
+        function updateTotal() {
+            columns.forEach((col, index) => {
+                let total = 0;
+                document.querySelectorAll(`input[data-col="${index}"]`).forEach(input => {
+                    total += parseFloat(input.value) || 0;
+                });
+                document.getElementById(`total_${index}`).textContent = total.toFixed(2);
+            });
+        }
+
+        function updateAllCalculations() {
+            updateFormCalculations();
+            updateTotal();
+            // Cập nhật lại các giá trị trong bảng dựa trên form trên
+            document.querySelectorAll('#tabContent input').forEach(input => {
+                updateTableCalculations(input);
+            });
+        }
+
+        function switchTab(tabName) {
+            const tabContent = document.getElementById('tabContent');
+            switch (tabName) {
+                case 'businessTab':
+                    tabContent.innerHTML = createTable(sampleData.business, "Theo mảng kinh doanh");
+                    break;
+                case 'employeeTab':
+                    tabContent.innerHTML = createTable(sampleData.employee, "Theo nhân viên");
+                    break;
+                case 'sourceTab':
+                    tabContent.innerHTML = createTable(sampleData.source, "Theo nguồn");
+                    break;
+            }
+            updateAllCalculations();
+        }
+
+        // Event Listeners
+        totalAmountInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value ? formatCurrency(value) : '';
+            updateAllCalculations();
+        });
+
+        quarterInputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateAllCalculations);
+        });
+
+        // Xử lý chuyển đổi tab
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('text-blue-600', 'border-blue-600');
+                    btn.classList.add('text-gray-500', 'border-transparent');
+                });
+                this.classList.remove('text-gray-500', 'border-transparent');
+                this.classList.add('text-blue-600', 'border-blue-600');
+                switchTab(this.dataset.target);
+            });
+        });
+
+        // Hiển thị tab đầu tiên khi tải trang
+        switchTab('businessTab');
+    </script>
+</body>
+
+</html>

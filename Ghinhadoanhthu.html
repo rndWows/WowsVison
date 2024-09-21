@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biểu mẫu Phân bổ Năm Tài chính</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .input-currency::-webkit-outer-spin-button,
+        .input-currency::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/css/toast@1.0.1/fuiToast.min.css">
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/js/toast@1.0.1/fuiToast.min.js"></script>
+
+
+</head>
+
+<body class="bg-gradient-to-r from-blue-100 to-blue-200 min-h-screen flex items-center justify-center p-4">
+    <div id="fui-toast"></div>
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-8xl w-full">
+        <h1 class="text-4xl font-bold mb-8 text-center text-blue-600">Biểu mẫu Phân bổ Năm Tài chính</h1>
+        <form id="allocationForm" class="space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-2">
+                    <label for="fiscalYear" class="block text-sm font-medium text-gray-700">Năm Tài chính</label>
+                    <input type="number" id="fiscalYear" name="fiscalYear" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                        placeholder="Nhập năm tài chính">
+                </div>
+                <div class="space-y-2">
+                    <label for="totalAmount" class="block text-sm font-medium text-gray-700">Tổng số tiền</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="text" id="totalAmount" name="totalAmount" required
+                            class="input-currency block w-full pr-12 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                            placeholder="0" aria-describedby="amount-currency">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-lg" id="amount-currency">VNĐ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4 bg-blue-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-semibold text-blue-800">Phân bổ Quý</h2>
+                <p id="remainingQuarterAllocation" class="text-blue-600 font-medium text-lg"></p>
+                <div id="quarterInputs" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                </div>
+            </div>
+
+            <div id="monthlyAllocation" class="space-y-6">
+                <h2 class="text-2xl font-semibold text-blue-800">Phân bổ Tháng</h2>
+                <div id="monthInputs" class="space-y-8"></div>
+            </div>
+            <div id="allocationInputs" class="space-y-8 mt-8"></div>
+            <div class="flex justify-center mt-8">
+                <button type="button" id="submitToAppSheet"
+                    class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+                    Gửi dữ liệu lên AppSheet
+                </button>
+            </div>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const quarterInputs = ['q1', 'q2', 'q3', 'q4'];
+        const months = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        // Constants for AppSheet API
+        const appId = 'e6017786-8311-4f98-9160-0ffa00686169';
+        const accessKey = 'V2-XsBEC-P7YR6-LBK2m-dYhVj-9SVNm-FUoLC-6HLgb-RP2Za';
+        const region = 'www';
+        
+
+
+        function apiRequest(tableName, action, data) {
+            const apiUrl = `https://${region}.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
+            return $.ajax({
+                url: apiUrl,
+                method: 'POST',
+                headers: {
+                    'ApplicationAccessKey': accessKey,
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({
+                    Action: action,
+                    Properties: {
+
+                    },
+                    ...data
+                })
+            }).then(response => {
+                return response;
+            }).catch(error => {
+                FuiToast.error("Lỗi hệ thống báo Admin để hỗ trợ.")
+
+                throw error;
+            });
+        }
+
+        const formatCurrency = (amount) =>
+            new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+
+        const parseAmount = (value) => parseFloat(totalAmountInput.value.replace(/[^0-9]/g, '')) || 0;
+
+        const form = document.getElementById('allocationForm');
+        const totalAmountInput = document.getElementById('totalAmount');
+        const monthlyAllocationDiv = document.getElementById('monthlyAllocation');
+        const monthInputsDiv = document.getElementById('monthInputs');
+        const remainingQuarterAllocationDiv = document.getElementById('remainingQuarterAllocation');
+        const quarterInputsDiv = document.getElementById('quarterInputs');
+
+        function initializeForm() {
+            quarterInputs.forEach((id, index) => {
+                const div = document.createElement('div');
+                div.className = 'space-y-2';
+                div.innerHTML = `
+                    <label for="${id}" class="block text-sm font-medium text-gray-700">%Quý ${index + 1}</label>
+                    <input type="number" id="${id}" name="${id}" required min="0" max="100"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg"
+                        placeholder="0">
+                    <p id="${id}Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                `;
+                quarterInputsDiv.appendChild(div);
+                document.getElementById(id).addEventListener('input', updateFormCalculations);
+            });
+        }
+
+        function updateFormCalculations() {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            let totalPercentage = 0;
+
+            quarterInputs.forEach((id, index) => {
+                const input = document.getElementById(id);
+                const percentage = parseFloat(input.value) || 0;
+                totalPercentage += percentage;
+                const amount = totalAmount * (percentage / 100);
+                document.getElementById(`${id}Amount`).textContent = formatCurrency(amount);
+            });
+
+            const remainingPercentage = 100 - totalPercentage;
+            const remainingAmount = totalAmount * (remainingPercentage / 100);
+            remainingQuarterAllocationDiv.textContent = `Còn phải phân bổ: ${remainingPercentage.toFixed(2)}% (${formatCurrency(remainingAmount)})`;
+
+            updateMonthlyAllocation();
+        }
+
+        function updateMonthlyAllocation() {
+            monthInputsDiv.innerHTML = '';
+            const totalAmount = parseAmount(totalAmountInput.value);
+
+            quarterInputs.forEach((id, index) => {
+                const quarterPercentage = parseFloat(document.getElementById(id).value) || 0;
+                const quarterAmount = totalAmount * (quarterPercentage / 100);
+
+                if (quarterPercentage > 0) {
+                    const monthInputDiv = document.createElement('div');
+                    monthInputDiv.className = 'bg-blue-50 p-6 rounded-lg space-y-4';
+                    monthInputDiv.innerHTML = `
+                        <h3 class="text-xl font-semibold text-blue-700">Quý ${index + 1} (${formatCurrency(quarterAmount)})</h3>
+                        <p id="remainingMonthAllocation${index}" class="text-blue-600 font-medium"></p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            ${[1, 2, 3].map(m => `
+                                <div class="space-y-2">
+                                    <label for="m${index * 3 + m}" class="block text-sm font-medium text-gray-700">%Tháng ${index * 3 + m}</label>
+                                    <input type="number" id="m${index * 3 + m}" name="m${index * 3 + m}" required min="0" max="100" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 text-lg" placeholder="0">
+                                    <p id="m${index * 3 + m}Amount" class="mt-1 text-sm text-gray-600 font-medium"></p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    monthInputsDiv.appendChild(monthInputDiv);
+
+                    [1, 2, 3].forEach(m => {
+                        document.getElementById(`m${index * 3 + m}`).addEventListener('input', () => updateMonthAmounts(index));
+                    });
+
+                    updateMonthAmounts(index);
+                }
+            });
+        }
+
+        function updateMonthAmounts(quarterIndex) {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            const quarterPercentage = parseFloat(document.getElementById(quarterInputs[quarterIndex]).value) || 0;
+            const quarterAmount = totalAmount * (quarterPercentage / 100);
+
+            let totalMonthPercentage = 0;
+            [1, 2, 3].forEach(i => {
+                const monthInput = document.getElementById(`m${quarterIndex * 3 + i}`);
+                const monthPercentage = parseFloat(monthInput.value) || 0;
+                totalMonthPercentage += monthPercentage;
+                const monthAmount = quarterAmount * (monthPercentage / 100);
+                document.getElementById(`m${quarterIndex * 3 + i}Amount`).textContent = formatCurrency(monthAmount);
+            });
+
+            const remainingMonthPercentage = 100 - totalMonthPercentage;
+            const remainingMonthAmount = quarterAmount * (remainingMonthPercentage / 100);
+            document.getElementById(`remainingMonthAllocation${quarterIndex}`).textContent =
+                `Còn phải phân bổ: ${remainingMonthPercentage.toFixed(2)}% (${formatCurrency(remainingMonthAmount)})`;
+        }
+
+        totalAmountInput.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value ? formatCurrency(value) : '';
+            updateFormCalculations();
+        });
+
+        // New function to send data to AppSheet
+        async function sendDataToAppSheet() {
+            const fiscalYear = document.getElementById('fiscalYear').value;
+            const totalAmount = parseAmount(totalAmountInput.value);
+
+            let quarterData = {};
+            quarterInputs.forEach(id => {
+                quarterData[id] = parseFloat(document.getElementById(id).value) || 0;
+            });
+
+            let monthData = {};
+            for (let i = 1; i <= 12; i++) {
+                const monthInput = document.getElementById(`m${i}`);
+                monthData[`month${i}`] = monthInput ? parseFloat(monthInput.value) || 0 : 0;
+            }
+            console.log(monthData);
+            console.log(quarterData);
+            const duAnData = {
+                "Năm Phân Bổ": fiscalYear,
+                "Số tiền": totalAmount,
+                "Quý 1": quarterData.q1 / 100,
+
+                "Quý 2": quarterData.q2 / 100,
+                "Quý 3": quarterData.q3 / 100,
+                "Quý 4": quarterData.q4 / 100,
+                "Tháng 1": monthData.month1 / 100,
+                "Tháng 2": monthData.month2 / 100,
+                "Tháng 3": monthData.month3 / 100,
+                "Tháng 4": monthData.month4 / 100,
+
+
+                "Tháng 5": monthData.month5 / 100,
+                "Tháng 6": monthData.month6 / 100,
+                "Tháng 7": monthData.month7 / 100,
+                "Tháng 8": monthData.month8 / 100,
+                "Tháng 9": monthData.month9 / 100,
+                "Tháng 10": monthData.month10 / 100,
+                "Tháng 11": monthData.month11 / 100,
+                "Tháng 12": monthData.month12 / 100
+
+            };
+
+            console.log(duAnData);
+
+
+            const duAnResponse = await apiRequest('FormPhanbo', 'Add', {
+                Rows: [duAnData]
+            });
+            // Tạo một mảng chứa thông tin Loại Phân Bổ và Chi Tiết
+            const phanBoInfo = [
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh trung tâm" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh theo yêu cầu" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh doanh nghiệp" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tư vấn doanh nghiệp" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Phần mềm" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tuyển dụng" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Doanh thu LEA khác" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Doanh thu VIS khác" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Lã Văn Tiến" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Đỗ Thị Kim Thuỷ" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Trần Thị Cẩm Nhung" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Nguyễn Thị Mỹ Diên" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Huỳnh Anh Tuấn" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "01. Tìm kiếm online" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "02. Giới thiệu/ Cộng tác viên" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "03. Sự kiện trực tiếp" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "04. KH cũ đăng ký lại" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "05. Quảng cáo ngoài trời" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "06. Hiệp hội" },
+                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "07. Khác" }
+            ];
+
+            // Tạo mảng phanBoDuAnData với thông tin tự động tạo
+            const phanBoDuAnData = phanBoInfo.map((item, index) => ({
+                'Năm phân bổ': duAnData["Năm Phân Bổ"],
+                'Loại Phân Bổ': item.LoaiPhanBo,
+                'Chi Tiết': item.ChiTiet
+
+            }));
+
+            const phanBoDuAnResponse = await apiRequest('PHANBODT', 'Add', {
+                Rows: phanBoDuAnData
+            });
+            
+            FuiToast.success("Gửi dữ liệu thành công.")
+
+
+
+        }
+
+        // Add event listener to the submit button
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeForm();
+            document.getElementById('submitToAppSheet').addEventListener('click', sendDataToAppSheet);
+        });
+    </script>
+</body>
+
+</html>
