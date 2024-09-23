@@ -19,25 +19,21 @@
 
 <body class="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
     <nav class="fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-10">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center">
-                <img src="https://wows.vn/wp-content/uploads/2022/04/WOWS-GROUP-logo.png" alt="WOWS Group"
-                    class="h-8 mr-4">
-                <h1 class="text-xl font-bold text-gray-800 dark:text-white">Thống kê công việc</h1>
+        <div class="container mx-auto px-4 py-3 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center">
+                    <img src="https://wows.vn/wp-content/uploads/2022/04/WOWS-GROUP-logo.png" alt="WOWS Group"
+                        class="h-8 mr-4">
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">Thống kê công việc</h1>
+                </div>
+                <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
             </div>
-            <button id="darkModeToggle" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-800 dark:text-white" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-            </button>
-        </div>
-    </nav>
-
-    <div class="container mx-auto p-4 mt-16">
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Bộ lọc</h2>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <select id="employeeFilter"
                     class="w-full p-2 border rounded-md bg-gray-50 dark:bg-gray-700 dark:text-white">
@@ -55,7 +51,10 @@
                     class="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">Reset</button>
             </div>
         </div>
+    </nav>
 
+
+    <div class="container mx-auto p-4 pt-32">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tổng hợp</h2>
@@ -104,38 +103,54 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tình trạng hoàn thành</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-100 dark:bg-gray-700">
-                                <th class="text-left p-2">Nhân viên phụ trách</th>
-                                <th class="text-right p-2">Đúng hạn</th>
-                                <th class="text-right p-2">Trễ hạn</th>
-                                <th class="text-right p-2">Tổng cộng</th>
-                                <th class="text-right p-2">Tỷ lệ trễ</th>
+                <div id="completionStatusChart" style="height: 400px;"></div>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-4 py-2">Nhân viên phụ trách</th>
+                                <th scope="col" class="px-4 py-2">Đúng hạn</th>
+                                <th scope="col" class="px-4 py-2">Trễ hạn</th>
+                                <th scope="col" class="px-4 py-2">Tổng cộng</th>
+                                <th scope="col" class="px-4 py-2">Tỷ lệ trễ</th>
                             </tr>
                         </thead>
                         <tbody id="completionStatusTable"></tbody>
                     </table>
                 </div>
+                <div class="mt-4 flex justify-between items-center">
+                    <button id="prevCompletionStatus"
+                        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Trước</button>
+                    <span id="completionStatusPage">Trang 1</span>
+                    <button id="nextCompletionStatus"
+                        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Sau</button>
+                </div>
             </div>
 
             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-white">Tình trạng duyệt công việc</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead>
-                            <tr class="bg-gray-100 dark:bg-gray-700">
-                                <th class="text-left p-2">Nhân viên phụ trách</th>
-                                <th class="text-right p-2">Đang xem xét</th>
-                                <th class="text-right p-2">Đã duyệt</th>
-                                <th class="text-right p-2">Chờ duyệt</th>
-                                <th class="text-right p-2">Từ chối</th>
-                                <th class="text-right p-2">Tổng cộng</th>
+                <div id="approvalStatusChart" style="height: 400px;"></div>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-4 py-2">Nhân viên phụ trách</th>
+                                <th scope="col" class="px-4 py-2">Đang xem xét</th>
+                                <th scope="col" class="px-4 py-2">Đã duyệt</th>
+                                <th scope="col" class="px-4 py-2">Chờ duyệt</th>
+                                <th scope="col" class="px-4 py-2">Từ chối</th>
+                                <th scope="col" class="px-4 py-2">Tổng cộng</th>
                             </tr>
                         </thead>
                         <tbody id="approvalStatusTable"></tbody>
                     </table>
+                </div>
+                <div class="mt-4 flex justify-between items-center">
+                    <button id="prevApprovalStatus"
+                        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Trước</button>
+                    <span id="approvalStatusPage">Trang 1</span>
+                    <button id="nextApprovalStatus"
+                        class="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300">Sau</button>
                 </div>
             </div>
         </div>
@@ -246,8 +261,10 @@
             updateSummary();
             updateStatusPieChart();
             updateTaskTimelineChart();
-            updateCompletionStatusTable();
-            updateApprovalStatusTable();
+            // updateCompletionStatusTable();
+            // updateApprovalStatusTable();
+            updateCompletionStatusChart();
+            updateApprovalStatusChart();
         }
 
         function updateSummary() {
@@ -435,10 +452,115 @@
                 }]
             });
         }
-        function updateCompletionStatusTable() {
-            const tableBody = document.getElementById('completionStatusTable');
-            tableBody.innerHTML = '';
 
+        let completionStatusPage = 1;
+        let approvalStatusPage = 1;
+        const rowsPerPage = 5;
+
+        function updateCompletionStatusTable(completionStatus) {
+            const tableBody = document.getElementById('completionStatusTable');
+            const pageSpan = document.getElementById('completionStatusPage');
+            const prevButton = document.getElementById('prevCompletionStatus');
+            const nextButton = document.getElementById('nextCompletionStatus');
+
+            const entries = Object.entries(completionStatus);
+            const totalPages = Math.ceil(entries.length / rowsPerPage);
+
+            function updateTable() {
+                tableBody.innerHTML = '';
+                const start = (completionStatusPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageEntries = entries.slice(start, end);
+
+                pageEntries.forEach(([employee, status]) => {
+                    const total = status.onTime + status.late;
+                    const lateRatio = total > 0 ? (status.late / total * 100).toFixed(2) : 0;
+
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                <td class="px-4 py-2">${employee}</td>
+                <td class="px-4 py-2">${status.onTime}</td>
+                <td class="px-4 py-2">${status.late}</td>
+                <td class="px-4 py-2">${total}</td>
+                <td class="px-4 py-2 ${lateRatio > 20 ? 'text-red-600' : lateRatio > 10 ? 'text-yellow-600' : 'text-green-600'}">${lateRatio}%</td>
+            `;
+                });
+
+                pageSpan.textContent = `Trang ${completionStatusPage} / ${totalPages}`;
+                prevButton.disabled = completionStatusPage === 1;
+                nextButton.disabled = completionStatusPage === totalPages;
+            }
+
+            updateTable();
+
+            prevButton.onclick = () => {
+                if (completionStatusPage > 1) {
+                    completionStatusPage--;
+                    updateTable();
+                }
+            };
+
+            nextButton.onclick = () => {
+                if (completionStatusPage < totalPages) {
+                    completionStatusPage++;
+                    updateTable();
+                }
+            };
+        }
+
+        function updateApprovalStatusTable(approvalStatus) {
+            const tableBody = document.getElementById('approvalStatusTable');
+            const pageSpan = document.getElementById('approvalStatusPage');
+            const prevButton = document.getElementById('prevApprovalStatus');
+            const nextButton = document.getElementById('nextApprovalStatus');
+
+            const entries = Object.entries(approvalStatus);
+            const totalPages = Math.ceil(entries.length / rowsPerPage);
+
+            function updateTable() {
+                tableBody.innerHTML = '';
+                const start = (approvalStatusPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                const pageEntries = entries.slice(start, end);
+
+                pageEntries.forEach(([employee, status]) => {
+                    const total = status.reviewing + status.approved + status.pending + status.rejected;
+
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                <td class="px-4 py-2">${employee}</td>
+                <td class="px-4 py-2">${status.reviewing}</td>
+                <td class="px-4 py-2">${status.approved}</td>
+                <td class="px-4 py-2">${status.pending}</td>
+                <td class="px-4 py-2">${status.rejected}</td>
+                <td class="px-4 py-2 font-bold">${total}</td>
+            `;
+                });
+
+                pageSpan.textContent = `Trang ${approvalStatusPage} / ${totalPages}`;
+                prevButton.disabled = approvalStatusPage === 1;
+                nextButton.disabled = approvalStatusPage === totalPages;
+            }
+
+            updateTable();
+
+            prevButton.onclick = () => {
+                if (approvalStatusPage > 1) {
+                    approvalStatusPage--;
+                    updateTable();
+                }
+            };
+
+            nextButton.onclick = () => {
+                if (approvalStatusPage < totalPages) {
+                    approvalStatusPage++;
+                    updateTable();
+                }
+            };
+        }
+
+        function updateCompletionStatusChart() {
+            console.log("Bắt đầu cập nhật biểu đồ tình trạng hoàn thành");
             const completionStatus = filteredData.reduce((acc, item) => {
                 const employee = item['Nhân viên phụ trách'];
                 if (!acc[employee]) {
@@ -452,36 +574,78 @@
                 return acc;
             }, {});
 
-            Object.entries(completionStatus).forEach(([employee, status], index) => {
-                const total = status.onTime + status.late;
-                const lateRatio = total > 0 ? (status.late / total * 100).toFixed(2) : 0;
-
-                const row = tableBody.insertRow();
-                row.className = index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
-                row.innerHTML = `
-            <td class="p-2">${employee}</td>
-            <td class="text-right p-2">${status.onTime}</td>
-            <td class="text-right p-2">${status.late}</td>
-            <td class="text-right p-2">${total}</td>
-            <td class="text-right p-2">${lateRatio}%</td>
-        `;
-
-                // Thêm màu sắc cho tỷ lệ trễ
-                const lateRatioCell = row.cells[4];
-                if (lateRatio > 20) {
-                    lateRatioCell.classList.add('text-red-600', 'dark:text-red-400');
-                } else if (lateRatio > 10) {
-                    lateRatioCell.classList.add('text-yellow-600', 'dark:text-yellow-400');
-                } else {
-                    lateRatioCell.classList.add('text-green-600', 'dark:text-green-400');
+            const completionStatus1 = filteredData.reduce((acc, item) => {
+                const employee = item['Nhân viên phụ trách'];
+                if (!acc[employee]) {
+                    acc[employee] = { onTime: 0, late: 0 };
                 }
+                if (item['Tình trạng hoàn thành'] === 'Đúng hạn') {
+                    acc[employee].onTime++;
+                } else if (item['Tình trạng hoàn thành'] === 'Trễ hạn') {
+                    acc[employee].late++;
+                }
+                return acc;
+            }, {});
+
+            console.log("Dữ liệu tình trạng hoàn thành:", completionStatus1);
+
+            const categories = Object.keys(completionStatus1);
+            const onTimeData = categories.map(employee => completionStatus1[employee].onTime);
+            const lateData = categories.map(employee => completionStatus1[employee].late);
+
+            console.log("Categories:", categories);
+            console.log("Đúng hạn:", onTimeData);
+            console.log("Trễ hạn:", lateData);
+
+            if (categories.length === 0) {
+                console.warn("Không có dữ liệu cho biểu đồ tình trạng hoàn thành");
+                document.getElementById('completionStatusChart').innerHTML = 'Không có dữ liệu để hiển thị';
+                return;
+            }
+
+            Highcharts.chart('completionStatusChart', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Tình trạng hoàn thành theo nhân viên'
+                },
+                xAxis: {
+                    categories: categories,
+                    title: {
+                        text: 'Nhân viên phụ trách'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Số lượng công việc'
+                    }
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                series: [{
+                    name: 'Trễ hạn',
+                    data: lateData,
+                    color: '#EF4444'
+                }, {
+                    name: 'Đúng hạn',
+                    data: onTimeData,
+                    color: '#10B981'
+                }]
             });
+            console.log("Hoàn thành cập nhật biểu đồ tình trạng hoàn thành");
+            // Cập nhật bảng
+            updateCompletionStatusTable(completionStatus);
         }
 
-        function updateApprovalStatusTable() {
-            const tableBody = document.getElementById('approvalStatusTable');
-            tableBody.innerHTML = '';
-
+        function updateApprovalStatusChart() {
+            console.log("Bắt đầu cập nhật biểu đồ tình trạng duyệt công việc");
             const approvalStatus = filteredData.reduce((acc, item) => {
                 const employee = item['Nhân viên phụ trách'];
                 if (!acc[employee]) {
@@ -499,20 +663,90 @@
                 return acc;
             }, {});
 
-            Object.entries(approvalStatus).forEach(([employee, status], index) => {
-                const total = status.reviewing + status.approved + status.pending + status.rejected;
+            const approvalStatus1 = filteredData.reduce((acc, item) => {
+                const employee = item['Nhân viên phụ trách'];
+                if (!acc[employee]) {
+                    acc[employee] = { reviewing: 0, approved: 0, pending: 0, rejected: 0 };
+                }
+                if (item['Trạng thái Duyệt'] === 'Chờ duyệt') {
+                    acc[employee].reviewing++;
+                } else if (item['Trạng thái Duyệt'] === 'Đã duyệt') {
+                    acc[employee].approved++;
+                } else if (item['Trạng thái Duyệt'] === null || item['Trạng thái Duyệt'] === '') {
+                    acc[employee].pending++;
+                } else if (item['Trạng thái Duyệt'] === 'Từ chối') {
+                    acc[employee].rejected++;
+                }
+                return acc;
+            }, {});
 
-                const row = tableBody.insertRow();
-                row.className = index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700' : 'bg-white dark:bg-gray-800';
-                row.innerHTML = `
-            <td class="p-2">${employee}</td>
-            <td class="text-right p-2">${status.reviewing}</td>
-            <td class="text-right p-2">${status.approved}</td>
-            <td class="text-right p-2">${status.pending}</td>
-            <td class="text-right p-2">${status.rejected}</td>
-            <td class="text-right p-2 font-bold">${total}</td>
-        `;
+            console.log("Dữ liệu tình trạng duyệt công việc:", approvalStatus1);
+
+            const categories = Object.keys(approvalStatus1);
+            const reviewingData = categories.map(employee => approvalStatus1[employee].reviewing);
+            const approvedData = categories.map(employee => approvalStatus1[employee].approved);
+            const pendingData = categories.map(employee => approvalStatus1[employee].pending);
+            const rejectedData = categories.map(employee => approvalStatus1[employee].rejected);
+
+            console.log("Categories:", categories);
+            console.log("Đang xem xét:", reviewingData);
+            console.log("Đã duyệt:", approvedData);
+            console.log("Chờ duyệt:", pendingData);
+            console.log("Từ chối:", rejectedData);
+
+            if (categories.length === 0) {
+                console.warn("Không có dữ liệu cho biểu đồ tình trạng duyệt công việc");
+                document.getElementById('approvalStatusChart').innerHTML = 'Không có dữ liệu để hiển thị';
+                return;
+            }
+
+            Highcharts.chart('approvalStatusChart', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Tình trạng duyệt công việc theo nhân viên'
+                },
+                xAxis: {
+                    categories: categories,
+                    title: {
+                        text: 'Nhân viên phụ trách'
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: 'Số lượng công việc'
+                    }
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                },
+                series: [{
+                    name: 'Từ chối',
+                    data: rejectedData,
+                    color: '#EF4444'
+                }, {
+                    name: 'Chờ duyệt',
+                    data: pendingData,
+                    color: '#FBBF24'
+                }, {
+                    name: 'Đã duyệt',
+                    data: approvedData,
+                    color: '#10B981'
+                }, {
+                    name: 'Đang xem xét',
+                    data: reviewingData,
+                    color: '#3B82F6'
+                }]
             });
+            console.log("Hoàn thành cập nhật biểu đồ tình trạng duyệt công việc");
+            // Cập nhật bảng
+            updateApprovalStatusTable(approvalStatus);
         }
 
         function populateFilters() {
@@ -563,7 +797,7 @@
             document.getElementById(id).addEventListener('change', filterData);
         });
 
-       
+
         function initializeDarkMode() {
             const savedMode = localStorage.getItem('darkMode');
             if (savedMode !== null) {
@@ -574,7 +808,7 @@
             }
             updateDarkModeIcon();
         }
-        
+
         // Call the initialization function when the page loads
         document.addEventListener('DOMContentLoaded', initializeDarkMode);
         // Initialize the dashboard
