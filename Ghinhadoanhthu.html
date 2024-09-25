@@ -12,6 +12,20 @@
             -webkit-appearance: none;
             margin: 0;
         }
+
+        /* Thêm CSS cho tab */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-button.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
     </style>
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/gh/lelinh014756/fui-toast-js@master/assets/css/toast@1.0.1/fuiToast.min.css">
@@ -58,6 +72,80 @@
                 <div id="monthInputs" class="space-y-8"></div>
             </div>
             <div id="allocationInputs" class="space-y-8 mt-8"></div>
+            <div class="mt-8">
+                <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex" aria-label="Tabs">
+                        <button type="button"
+                            class="tab-button bg-white inline-block p-4 text-blue-600 hover:text-blue-800 font-medium"
+                            data-tab="mang">
+                            Phân bổ theo mảng
+                        </button>
+                        <button type="button"
+                            class="tab-button bg-white inline-block p-4 text-blue-600 hover:text-blue-800 font-medium"
+                            data-tab="nhanvien">
+                            Phân bổ theo nhân viên
+                        </button>
+                        <button type="button"
+                            class="tab-button bg-white inline-block p-4 text-blue-600 hover:text-blue-800 font-medium"
+                            data-tab="nguon">
+                            Phân bổ theo nguồn
+                        </button>
+                    </nav>
+                </div>
+                <div id="tabContent" class="mt-4">
+                    <div id="mangTab" class="tab-content">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Chi tiết</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        % Năm</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="mangTableBody">
+                                <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="nhanvienTab" class="tab-content">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Chi tiết</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        % Năm</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="nhanvienTableBody">
+                                <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="nguonTab" class="tab-content">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Chi tiết</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        % Năm</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="nguonTableBody">
+                                <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="flex justify-center mt-8">
                 <button type="button" id="submitToAppSheet"
                     class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
@@ -75,9 +163,144 @@
         const appId = 'e6017786-8311-4f98-9160-0ffa00686169';
         const accessKey = 'V2-XsBEC-P7YR6-LBK2m-dYhVj-9SVNm-FUoLC-6HLgb-RP2Za';
         const region = 'www';
-        
+        let totalAllocated = 0;
+        const phanBoInfo = [
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh trung tâm" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh theo yêu cầu" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh doanh nghiệp" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tư vấn doanh nghiệp" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Phần mềm" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tuyển dụng" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Doanh thu LEA khác" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Doanh thu VIS khác" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Lã Văn Tiến" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Đỗ Thị Kim Thuỷ" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Trần Thị Cẩm Nhung" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Nguyễn Thị Mỹ Diên" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Huỳnh Anh Tuấn" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "01. Tìm kiếm online" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "02. Giới thiệu/ Cộng tác viên" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "03. Sự kiện trực tiếp" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "04. KH cũ đăng ký lại" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "05. Quảng cáo ngoài trời" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "06. Hiệp hội" },
+            { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "07. Khác" }
+        ];
 
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
 
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tab = button.dataset.tab;
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    button.classList.add('active');
+                    document.getElementById(`${tab}Tab`).classList.add('active');
+                });
+            });
+
+            // Hiển thị tab đầu tiên mặc định
+            tabButtons[0].classList.add('active');
+            tabContents[0].classList.add('active');
+        }
+
+        function populateTables() {
+            const mangTableBody = document.getElementById('mangTableBody');
+            const nhanvienTableBody = document.getElementById('nhanvienTableBody');
+            const nguonTableBody = document.getElementById('nguonTableBody');
+
+            phanBoInfo.forEach((item, index) => {
+                const row = `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.ChiTiet}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <input type="number" id="phanBo${index}" name="phanBo${index}" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm 
+                                  focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" 
+                           min="0" max="100" step="0.01" placeholder="0" oninput="updateAllocation(${index})">
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="amount${index}"></td>
+            </tr>
+        `;
+
+                if (item.LoaiPhanBo === "Phân bổ doanh thu theo mảng") {
+                    mangTableBody.innerHTML += row;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nhân viên") {
+                    nhanvienTableBody.innerHTML += row;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nguồn") {
+                    nguonTableBody.innerHTML += row;
+                }
+            });
+
+            // Thêm hàng tổng cộng cho mỗi bảng
+            const totalRow = `
+        <tr class="bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tổng cộng</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="totalPercent"></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="totalAmount"></td>
+        </tr>
+    `;
+            mangTableBody.innerHTML += totalRow;
+            nhanvienTableBody.innerHTML += totalRow;
+            nguonTableBody.innerHTML += totalRow;
+
+            // Thêm hàng còn phải phân bổ
+            const remainingRow = `
+        <tr class="bg-blue-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-900">Còn phải phân bổ</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500" id="remainingPercent"></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500" id="remainingAmount"></td>
+        </tr>
+    `;
+            mangTableBody.innerHTML += remainingRow;
+            nhanvienTableBody.innerHTML += remainingRow;
+            nguonTableBody.innerHTML += remainingRow;
+            updateTotalAllocation();
+        }
+        function updateAllocation(index) {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            const percentInput = document.getElementById(`phanBo${index}`);
+            const amountCell = document.getElementById(`amount${index}`);
+
+            const percent = parseFloat(percentInput.value) || 0;
+            const amount = totalAmount * (percent / 100);
+
+            amountCell.textContent = formatCurrency(amount);
+
+            updateTotalAllocation();
+        }
+        function updateTotalAllocation() {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            let totalPercent = 0;
+            let totalAllocatedAmount = 0;
+
+            phanBoInfo.forEach((_, index) => {
+                const percentInput = document.getElementById(`phanBo${index}`);
+                const percent = parseFloat(percentInput.value) || 0;
+                totalPercent += percent;
+                totalAllocatedAmount += totalAmount * (percent / 100);
+            });
+
+            // Cập nhật Tổng cộng
+            document.querySelectorAll('[id^="totalPercent"]').forEach(el => {
+                el.textContent = totalPercent.toFixed(2) + '%';
+            });
+            document.querySelectorAll('[id^="totalAmount"]').forEach(el => {
+                el.textContent = formatCurrency(totalAllocatedAmount);
+            });
+
+            // Cập nhật Còn phải phân bổ
+            const remainingPercent = 100 - totalPercent;
+            const remainingAmount = totalAmount - totalAllocatedAmount;
+            document.querySelectorAll('[id^="remainingPercent"]').forEach(el => {
+                el.textContent = remainingPercent.toFixed(2) + '%';
+            });
+            document.querySelectorAll('[id^="remainingAmount"]').forEach(el => {
+                el.textContent = formatCurrency(remainingAmount);
+            });
+        }
         function apiRequest(tableName, action, data) {
             const apiUrl = `https://${region}.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
             return $.ajax({
@@ -260,42 +483,19 @@
                 Rows: [duAnData]
             });
             // Tạo một mảng chứa thông tin Loại Phân Bổ và Chi Tiết
-            const phanBoInfo = [
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh trung tâm" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh theo yêu cầu" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Tiếng Anh doanh nghiệp" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tư vấn doanh nghiệp" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Phần mềm" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Tuyển dụng" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[LEA] Doanh thu LEA khác" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo mảng", ChiTiet: "[VIS] Doanh thu VIS khác" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Lã Văn Tiến" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Đỗ Thị Kim Thuỷ" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Trần Thị Cẩm Nhung" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Nguyễn Thị Mỹ Diên" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nhân viên", ChiTiet: "Huỳnh Anh Tuấn" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "01. Tìm kiếm online" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "02. Giới thiệu/ Cộng tác viên" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "03. Sự kiện trực tiếp" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "04. KH cũ đăng ký lại" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "05. Quảng cáo ngoài trời" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "06. Hiệp hội" },
-                { LoaiPhanBo: "Phân bổ doanh thu theo nguồn", ChiTiet: "07. Khác" }
-            ];
 
-            // Tạo mảng phanBoDuAnData với thông tin tự động tạo
             const phanBoDuAnData = phanBoInfo.map((item, index) => ({
                 'Năm phân bổ': duAnData["Năm Phân Bổ"],
                 'Loại Phân Bổ': item.LoaiPhanBo,
-                'Chi Tiết': item.ChiTiet
-
+                'Chi Tiết': item.ChiTiet,
+                '%Năm': parseFloat(document.getElementById(`phanBo${index}`).value) /100  || 0
             }));
 
             const phanBoDuAnResponse = await apiRequest('PHANBODT', 'Add', {
                 Rows: phanBoDuAnData
             });
-            
-            FuiToast.success("Gửi dữ liệu thành công.")
+
+            FuiToast.success("Gửi dữ liệu thành công.");
 
 
 
@@ -304,6 +504,8 @@
         // Add event listener to the submit button
         document.addEventListener('DOMContentLoaded', () => {
             initializeForm();
+            initializeTabs();
+            populateTables();
             document.getElementById('submitToAppSheet').addEventListener('click', sendDataToAppSheet);
         });
     </script>
