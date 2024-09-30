@@ -505,34 +505,32 @@
             console.log(duAnData);
 
 
+
+
+            const phanBoDuAnData = phanBoInfo.map((item, index) => {
+
+                const percentNam = parseFloat(document.getElementById(`phanBo${index}`).value) / 100 || 0;
+                const nhanSuPercent = parseFloat(document.getElementById(`nhanSu${index}`).value) / 100 || 0;
+                const vanHanhPercent = parseFloat(document.getElementById(`vanHanh${index}`).value) / 100 || 0;
+                const nghiepVuPercent = parseFloat(document.getElementById(`nghiepVu${index}`).value) / 100 || 0;
+
+                return {
+                    'Năm phân bổ': fiscalYear,
+                    'Loại Phân Bổ': item.LoaiPhanBo,
+                    'Khoản': item.ChiTiet,
+                    '%Năm': percentNam,
+                    'Chi phí nhân sự': nhanSuPercent,
+                    'Chi phí vận hành': vanHanhPercent,
+                    'Chi phí nghiệp vụ': nghiepVuPercent
+                };
+
+            })
+            console.log(phanBoDuAnData);
             const duAnResponse = await apiRequest('FormChiphi', 'Add', {
                 Rows: [duAnData]
             });
-            // Tạo một mảng chứa thông tin Loại Phân Bổ và Chi Tiết
-
-            const phanBoDuAnData = phanBoInfo.map((item, index) => {
-                if (item.LoaiPhanBo === "Phân bổ chi phí theo phòng") {
-                    const percentNam = parseFloat(document.getElementById(`phanBo${index}`).value) / 100 || 0;
-                    const nhanSuPercent = parseFloat(document.getElementById(`nhanSu${index}`).value) / 100 || 0;
-                    const vanHanhPercent = parseFloat(document.getElementById(`vanHanh${index}`).value) / 100 || 0;
-                    const nghiepVuPercent = parseFloat(document.getElementById(`nghiepVu${index}`).value) / 100 || 0;
-
-                    return {
-                        'Năm phân bổ': fiscalYear,
-                        'Loại Phân Bổ': item.LoaiPhanBo,
-                        'Khoản': item.ChiTiet,
-                        '%Năm': percentNam,
-                        'Chi phí nhân sự (%)': nhanSuPercent,
-                        'Chi phí vận hành (%)': vanHanhPercent,
-                        'Chi phí nghiệp vụ (%)': nghiepVuPercent,
-                        'Số tiền phân bổ': totalAmount * percentNam
-                    };
-                }
-                return null;
-            }).filter(item => item !== null);
-
             const phanBoDuAnResponse = await apiRequest('PHANBOCHIPHI', 'Add', {
-                Rows: phanBoDuAnData
+                Rows:  phanBoDuAnData 
             });
 
             FuiToast.success("Gửi dữ liệu thành công.");
