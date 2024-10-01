@@ -209,12 +209,12 @@
         }
 
         function populateTables() {
-    const mangTableBody = document.getElementById('mangTableBody');
-    const nhanvienTableBody = document.getElementById('nhanvienTableBody');
-    const nguonTableBody = document.getElementById('nguonTableBody');
+            const mangTableBody = document.getElementById('mangTableBody');
+            const nhanvienTableBody = document.getElementById('nhanvienTableBody');
+            const nguonTableBody = document.getElementById('nguonTableBody');
 
-    phanBoInfo.forEach((item, index) => {
-        const row = `
+            phanBoInfo.forEach((item, index) => {
+                const row = `
         <tr>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.ChiTiet}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -227,24 +227,24 @@
         </tr>
     `;
 
-        if (item.LoaiPhanBo === "Phân bổ doanh thu theo mảng") {
-            mangTableBody.innerHTML += row;
-        } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nhân viên") {
-            nhanvienTableBody.innerHTML += row;
-        } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nguồn") {
-            nguonTableBody.innerHTML += row;
-        }
-    });
+                if (item.LoaiPhanBo === "Phân bổ doanh thu theo mảng") {
+                    mangTableBody.innerHTML += row;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nhân viên") {
+                    nhanvienTableBody.innerHTML += row;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nguồn") {
+                    nguonTableBody.innerHTML += row;
+                }
+            });
 
-    // Thêm hàng tổng cộng và còn phải phân bổ cho mỗi bảng
-    const tables = [
-        { body: mangTableBody, id: 'mang' },
-        { body: nhanvienTableBody, id: 'nhanvien' },
-        { body: nguonTableBody, id: 'nguon' }
-    ];
+            // Thêm hàng tổng cộng và còn phải phân bổ cho mỗi bảng
+            const tables = [
+                { body: mangTableBody, id: 'mang' },
+                { body: nhanvienTableBody, id: 'nhanvien' },
+                { body: nguonTableBody, id: 'nguon' }
+            ];
 
-    tables.forEach(table => {
-        table.body.innerHTML += `
+            tables.forEach(table => {
+                table.body.innerHTML += `
             <tr class="bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tổng cộng</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" id="totalPercent${table.id}"></td>
@@ -256,54 +256,54 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-500" id="remainingAmount${table.id}"></td>
             </tr>
         `;
-    });
+            });
 
-    updateTotalAllocation();
-}function updateAllocation(index, loaiPhanBo) {
-    const totalAmount = parseAmount(totalAmountInput.value);
-    const percentInput = document.getElementById(`phanBo${index}`);
-    const amountCell = document.getElementById(`amount${index}`);
+            updateTotalAllocation();
+        } function updateAllocation(index, loaiPhanBo) {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            const percentInput = document.getElementById(`phanBo${index}`);
+            const amountCell = document.getElementById(`amount${index}`);
 
-    const percent = parseFloat(percentInput.value) || 0;
-    const amount = totalAmount * (percent / 100);
+            const percent = parseFloat(percentInput.value) || 0;
+            const amount = totalAmount * (percent / 100);
 
-    amountCell.textContent = formatCurrency(amount);
+            amountCell.textContent = formatCurrency(amount);
 
-    updateTotalAllocation();
-}
-function updateTotalAllocation() {
-    const totalAmount = parseAmount(totalAmountInput.value);
-    totalAllocatedMang = 0;
-    totalAllocatedNhanVien = 0;
-    totalAllocatedNguon = 0;
-
-    phanBoInfo.forEach((item, index) => {
-        const percentInput = document.getElementById(`phanBo${index}`);
-        const percent = parseFloat(percentInput.value) || 0;
-        const amount = totalAmount * (percent / 100);
-
-        if (item.LoaiPhanBo === "Phân bổ doanh thu theo mảng") {
-            totalAllocatedMang += percent;
-        } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nhân viên") {
-            totalAllocatedNhanVien += percent;
-        } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nguồn") {
-            totalAllocatedNguon += percent;
+            updateTotalAllocation();
         }
-    });
+        function updateTotalAllocation() {
+            const totalAmount = parseAmount(totalAmountInput.value);
+            totalAllocatedMang = 0;
+            totalAllocatedNhanVien = 0;
+            totalAllocatedNguon = 0;
 
-    updateTableTotals('mang', totalAllocatedMang, totalAmount);
-    updateTableTotals('nhanvien', totalAllocatedNhanVien, totalAmount);
-    updateTableTotals('nguon', totalAllocatedNguon, totalAmount);
-}
-function updateTableTotals(tableId, totalPercent, totalAmount) {
-    document.getElementById(`totalPercent${tableId}`).textContent = totalPercent.toFixed(2) + '%';
-    document.getElementById(`totalAmount${tableId}`).textContent = formatCurrency(totalAmount * (totalPercent / 100));
+            phanBoInfo.forEach((item, index) => {
+                const percentInput = document.getElementById(`phanBo${index}`);
+                const percent = parseFloat(percentInput.value) || 0;
+                const amount = totalAmount * (percent / 100);
 
-    const remainingPercent = 100 - totalPercent;
-    const remainingAmount = totalAmount * (remainingPercent / 100);
-    document.getElementById(`remainingPercent${tableId}`).textContent = remainingPercent.toFixed(2) + '%';
-    document.getElementById(`remainingAmount${tableId}`).textContent = formatCurrency(remainingAmount);
-}
+                if (item.LoaiPhanBo === "Phân bổ doanh thu theo mảng") {
+                    totalAllocatedMang += percent;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nhân viên") {
+                    totalAllocatedNhanVien += percent;
+                } else if (item.LoaiPhanBo === "Phân bổ doanh thu theo nguồn") {
+                    totalAllocatedNguon += percent;
+                }
+            });
+
+            updateTableTotals('mang', totalAllocatedMang, totalAmount);
+            updateTableTotals('nhanvien', totalAllocatedNhanVien, totalAmount);
+            updateTableTotals('nguon', totalAllocatedNguon, totalAmount);
+        }
+        function updateTableTotals(tableId, totalPercent, totalAmount) {
+            document.getElementById(`totalPercent${tableId}`).textContent = totalPercent.toFixed(2) + '%';
+            document.getElementById(`totalAmount${tableId}`).textContent = formatCurrency(totalAmount * (totalPercent / 100));
+
+            const remainingPercent = 100 - totalPercent;
+            const remainingAmount = totalAmount * (remainingPercent / 100);
+            document.getElementById(`remainingPercent${tableId}`).textContent = remainingPercent.toFixed(2) + '%';
+            document.getElementById(`remainingAmount${tableId}`).textContent = formatCurrency(remainingAmount);
+        }
         function apiRequest(tableName, action, data) {
             const apiUrl = `https://${region}.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
             return $.ajax({
